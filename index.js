@@ -91,6 +91,10 @@ app.delete('/remove/:id', (req, res) => {
 app.put('/update/:id', (req, res) => {
     const docData = req.body
 
+    // Hanlde no fields detected
+    if (!docData)
+        return res.status(500).send({ message: "Oops! Something went wrong." })
+
     const filter = {
         "_id": new ObjectId(req.params.id)
     }
@@ -151,6 +155,20 @@ app.get('/task/:id', (req, res) => {
         })
         .catch(err => {
             console.log(err)
-            return res.status(201).send({ message: "Oops! Something went wrong." })
+            return res.status(500).send({ message: "Oops! Something went wrong." })
         })
-}500
+})
+
+// Error handling for bad URLs
+app.get('*', (req, res) => {
+    return res.status(500).send({ message: "Oops! Something went wrong." })
+})
+app.post('*', (req, res) => {
+    return res.status(500).send({ message: "Oops! Something went wrong." })
+})
+app.delete('*', (req, res) => {
+    return res.status(500).send({ message: "Oops! Something went wrong." })
+})
+app.put('*', (req, res) => {
+    return res.status(500).send({ message: "Oops! Something went wrong." })
+})
