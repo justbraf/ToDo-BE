@@ -45,9 +45,9 @@ app.post('/add', (req, res) => {
     // validate date format
     if (differenceInDays(new Date(data.dueDate), Date.now()) < 0)
         return res.status(200).send({ message: "Invalid date format, use: YYYY-MM-DD" })
-    else 
+    else
         data.dueDate = format(new Date(data.dueDate), "yyyy-MM-dd")
-    
+
     myTodos.insertOne(data)
         .then(dbRes => {
             let msg = {}
@@ -59,7 +59,7 @@ app.post('/add', (req, res) => {
         })
         .catch(err => {
             console.log(err)
-            return res.status(201).send({ message: "Oops! Something went wrong." })
+            return res.status(500).send({ message: "Oops! Something went wrong." })
         })
 })
 
@@ -73,23 +73,48 @@ app.delete('/remove/:id', (req, res) => {
     }
 
     myTodos.deleteOne(filter)
-    .then(dbRes=>{
-        let msg = {}
-        if (!dbRes.deletedCount)
-            msg.message = "Oops! Something went wrong."
-        else
-            msg.message = "Deleted sucessfully."
-        return res.status(200).send(msg)
-    })
-    .catch(err => {
-        console.log(err)
-        return res.status(201).send({ message: "Oops! Something went wrong." })
-    })
+        .then(dbRes => {
+            let msg = {}
+            if (!dbRes.deletedCount)
+                msg.message = "Oops! Something went wrong."
+            else
+                msg.message = "Deleted sucessfully."
+            return res.status(200).send(msg)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.status(500).send({ message: "Oops! Something went wrong." })
+        })
 })
 
 // update task
 app.put('/update/:id', (req, res) => {
-    return res.status(200).send("Hi")
+    const docData = req.body
+
+    const filter = {
+        "_id": new ObjectId(req.params.id)
+    }
+
+    const updDoc = {
+        $set: {
+            ...docData
+        }
+    }
+
+    myTodos.updateOne(filter, updDoc)
+        .then(dbRes => {
+            let msg = {}
+            console.log(dbRes)
+            if (!dbRes.matchedCount || !dbRes.modifiedCount)
+                msg.message = "Oops! Something went wrong."
+            else
+                msg.message = "Update sucessful."
+            return res.status(200).send(msg)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.status(500).send({ message: "Oops! Something went wrong." })
+        })
 })
 
 // get all tasks
@@ -105,7 +130,7 @@ app.get('/tasks', (req, res) => {
         })
         .catch(err => {
             console.log(err)
-            return res.status(201).send({ message: "Oops! Something went wrong." })
+            return res.status(500).send({ message: "Oops! Something went wrong." })
         })
 })
 
@@ -128,4 +153,4 @@ app.get('/task/:id', (req, res) => {
             console.log(err)
             return res.status(201).send({ message: "Oops! Something went wrong." })
         })
-})
+}500
