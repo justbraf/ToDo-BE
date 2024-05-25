@@ -45,33 +45,46 @@ app.post('/add', (req, res) => {
     // validate date format
     if (differenceInDays(new Date(data.dueDate), Date.now()) < 0)
         return res.status(200).send({ message: "Invalid date format, use: YYYY-MM-DD" })
-    else {
-        console.log("date: ", data.dueDate)
-        console.log("diff: ", differenceInDays(new Date(data.dueDate), Date.now()))
-        console.log("format: ", format(Date(data.dueDate), "yyyy-MM-dd"))
-        data.dueDate = format(Date(data.dueDate), "yyyy-MM-dd")
-    }
+    else 
+        data.dueDate = format(new Date(data.dueDate), "yyyy-MM-dd")
     
-    // myTodos.insertOne(data)
-    //     .then(dbRes => {
-    //         let msg = {}
-    //         if (!dbRes.insertedId)
-    //             msg.message = "Oops! Something went wrong."
-    //         else
-    //             msg.message = "Added successfully."
-    //         return res.status(201).send(msg)
-    //     })
-    //     .catch(err => {
-    //         console.log(err)
-    //         return res.status(201).send({ message: "Oops! Something went wrong." })
-    //     })
-    return res.status(201).send(data)
+    myTodos.insertOne(data)
+        .then(dbRes => {
+            let msg = {}
+            if (!dbRes.insertedId)
+                msg.message = "Oops! Something went wrong."
+            else
+                msg.message = "Added successfully."
+            return res.status(201).send(msg)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.status(201).send({ message: "Oops! Something went wrong." })
+        })
 })
 
 // Delete a task
-app.delete('/remove', (req, res) => {
+app.delete('/remove/:id', (req, res) => {
     // get param id
-    return res.status(200).send("Hi")
+    const data = req.params
+
+    const filter = {
+        "_id": new ObjectId(data.id)
+    }
+
+    myTodos.deleteOne(filter)
+    .then(dbRes=>{
+        let msg = {}
+        if (!dbRes.deletedCount)
+            msg.message = "Oops! Something went wrong."
+        else
+            msg.message = "Deleted sucessfully."
+        return res.status(200).send(msg)
+    })
+    .catch(err => {
+        console.log(err)
+        return res.status(201).send({ message: "Oops! Something went wrong." })
+    })
 })
 
 // update task
@@ -87,7 +100,7 @@ app.get('/tasks', (req, res) => {
             if (!dbRes.length)
                 msg.message = "No tasks were found."
             else
-                msg.data = dbRes
+                msg = dbRes
             return res.status(200).send(msg)
         })
         .catch(err => {
@@ -104,10 +117,11 @@ app.get('/task/:id', (req, res) => {
     myTodos.findOne(filter)
         .then(dbRes => {
             let msg = {}
-            if (!dbRes.length)
+            console.log(dbRes, !dbRes)
+            if (!dbRes)
                 msg.message = "No task was found."
             else
-                msg.data = dbRes
+                msg = dbRes
             return res.status(200).send(msg)
         })
         .catch(err => {
