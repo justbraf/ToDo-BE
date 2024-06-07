@@ -29,13 +29,13 @@ Optional fields:
 Deletes a specified task from the database\
 Route: http://localhost:3000/remove/(taskId) \
 Method: DELETE\
-Expected parameter: valid id
+Expected parameter: (taskId) is a valid id 
 
 ### The **UPDATE** route
 Updates a specific task's field(s) or adds new field(s)\
 Route: http://localhost:3000/update/(taskId) \
 Method: PUT\
-Expected parameter: valid id\
+Expected parameter: (taskId) is a valid id\
 Expected field: at least one field
 
 ### The **VIEW ALL** route
@@ -48,4 +48,4 @@ Expected field: none
 Returns a specific task from the database\
 Route: http://localhost:3000/task/[taskId] \
 Method: GET\
-Expected parameter: valid id
+Expected parameter: (taskId) is a valid id

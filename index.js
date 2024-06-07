@@ -91,7 +91,10 @@ app.delete('/remove/:id', (req, res) => {
 app.put('/update/:id', (req, res) => {
     const docData = req.body
 
-    // Hanlde no fields detected
+    // if req body contains an _id, remove it
+    delete docData._id
+
+    // Handle no fields detected
     if (!docData)
         return res.status(500).send({ message: "Oops! Something went wrong." })
 
@@ -108,9 +111,11 @@ app.put('/update/:id', (req, res) => {
     myTodos.updateOne(filter, updDoc)
         .then(dbRes => {
             let msg = {}
-            console.log(dbRes)
-            if (!dbRes.matchedCount || !dbRes.modifiedCount)
+            // console.log(dbRes)
+            if (!dbRes.matchedCount)
                 msg.message = "Oops! Something went wrong."
+            else if (!!dbRes.matchedCount && !dbRes.modifiedCount)
+                msg.message = "Nothing Was updated."
             else
                 msg.message = "Update sucessful."
             return res.status(200).send(msg)
@@ -146,7 +151,7 @@ app.get('/task/:id', (req, res) => {
     myTodos.findOne(filter)
         .then(dbRes => {
             let msg = {}
-            console.log(dbRes, !dbRes)
+            // console.log(dbRes, !dbRes)
             if (!dbRes)
                 msg.message = "No task was found."
             else
@@ -161,14 +166,17 @@ app.get('/task/:id', (req, res) => {
 
 // Error handling for bad URLs
 app.get('*', (req, res) => {
-    return res.status(500).send({ message: "Oops! Something went wrong." })
+    return res.status(500).send({ message: "Info: Unknown call to API." })
 })
 app.post('*', (req, res) => {
-    return res.status(500).send({ message: "Oops! Something went wrong." })
+    return res.status(500).send({ message: "Info: Unknown call to API." })
 })
 app.delete('*', (req, res) => {
-    return res.status(500).send({ message: "Oops! Something went wrong." })
+    return res.status(500).send({ message: "Info: Unknown call to API." })
 })
 app.put('*', (req, res) => {
-    return res.status(500).send({ message: "Oops! Something went wrong." })
+    return res.status(500).send({ message: "Info: Unknown call to API." })
+})
+app.patch('*', (req, res) => {
+    return res.status(500).send({ message: "Info: Unknown call to API." })
 })
